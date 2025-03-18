@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-scroll';
 import { Menu, X } from 'lucide-react';
 
 export const Navigation = () => {
@@ -30,18 +29,15 @@ export const Navigation = () => {
       }`}
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold text-primary">
+        <a href="/" className="text-2xl font-bold text-primary">
           Crearm
-        </Link>
+        </a>
 
-        
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden lg:flex items-center space-x-8">
           {navLinks.map((link) => (
-            <Link
+            <a
               key={link.href}
-              to={link.href}
-              smooth={true}
-              duration={500}
+              href={link.href}
               className={`font-medium transition-colors ${
                 isScrolled
                   ? 'text-foreground hover:text-primary'
@@ -49,19 +45,12 @@ export const Navigation = () => {
               }`}
             >
               {link.label}
-            </Link>
+            </a>
           ))}
-          <Link
-            href="#contact"
-            className="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-colors"
-          >
-            Reserva Ahora
-          </Link>
         </nav>
 
-        {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-foreground"
+          className="lg:hidden text-foreground"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle menu"
         >
@@ -72,28 +61,21 @@ export const Navigation = () => {
           )}
         </button>
       </div>
-      
+
       {isMenuOpen && (
-        <div className="md:hidden bg-background">
+        <div className="lg:hidden bg-background">
           <div className="container mx-auto px-4 py-4">
             <nav className="flex flex-col space-y-4">
               {navLinks.map((link) => (
-                <Link
+                <a
                   key={link.href}
                   href={link.href}
                   className="font-medium text-foreground hover:text-primary transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
-                </Link>
+                </a>
               ))}
-              <Link
-                href="#contact"
-                className="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-colors text-center"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Book Now
-              </Link>
             </nav>
           </div>
         </div>
@@ -104,8 +86,9 @@ export const Navigation = () => {
 
 const navLinks = [
   { label: 'Inicio', href: '#' },
-  { label: 'Sobre Mí', href: '#about' },
   { label: 'Servicios', href: '#services' },
+  { label: 'Sobre Mí', href: '#about' },
   { label: 'Donde Estamos', href: '#location' },
   { label: 'Testimonios', href: '#why-choose-us' },
+  { label: 'Contacto', href: '#contact' },
 ];

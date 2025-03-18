@@ -1,25 +1,120 @@
+import { IKImage } from 'imagekitio-react';
+import { useEffect, useRef, useState } from 'react';
+import { motion, useAnimation, useInView } from 'framer-motion';
+
 export const Services = () => {
+  const [flippedCard, setFlippedCard] = useState(null);
+  const cardRefs = useRef([]);
+
+  const titleRef = useRef(null);
+  const titleInView = useInView(titleRef, { once: false }); // Cambiar 'once' a false
+  const titleControls = useAnimation();
+
+  useEffect(() => {
+    if (titleInView) {
+      titleControls.start({ opacity: 1, y: 0, scale: 1 });
+    }
+  }, [titleInView]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        flippedCard !== null &&
+        cardRefs.current[flippedCard] &&
+        !cardRefs.current[flippedCard].contains(event.target)
+      ) {
+        setFlippedCard(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [flippedCard]);
+
+  const toggleCard = (index) => {
+    setFlippedCard((prev) => (prev === index ? null : index));
+  };
+
   return (
-    <section id="services" name="services" className="py-20 bg-white relative z-10">
-      <div className="absolute inset-0 bg-black/5 z-10" />
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
-          Our Services
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => (
-            <div
-              key={index}
-              className="bg-muted/30 rounded-lg p-8 shadow-sm hover:shadow-md transition-shadow"
+    <section
+      id="services"
+      name="services"
+      className="py-20 bg-white relative z-10 min-w-screen"
+    >
+      <motion.h2
+        ref={titleRef}
+        initial={{ opacity: 0, y: 50, scale: 0.95 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: false, amount: 0.1 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="text-3xl md:text-4xl font-bold text-center mb-16"
+      >
+        Nuestros Servicios
+      </motion.h2>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-8 px-4">
+        {services.map((service, index) => {
+          const cardRef = useRef(null);
+          
+          const isFlipped = flippedCard === index;
+
+          return (
+            <motion.div
+              key={service.title}
+              ref={(el) => {
+                cardRefs.current[index] = el;
+                cardRef.current = el;
+              }}
+              initial={{ opacity: 0, y: 50, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: false, amount: 0.1 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="w-120 h-60 mx-auto"
+              onClick={() => toggleCard(index)}
             >
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                <service.icon className="w-8 h-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-4">{service.title}</h3>
-              <p className="text-muted-foreground">{service.description}</p>
-            </div>
-          ))}
-        </div>
+              <motion.div
+                className="relative w-full h-full cursor-pointer transition-transform duration-300 hover:scale-105"
+                animate={{ rotateY: isFlipped ? 180 : 0 }}
+                transition={{ duration: 0.6 }}
+                style={{ transformStyle: 'preserve-3d' }}
+              >
+                <div className="absolute w-full h-full shadow-md rounded-xl overflow-hidden">
+                  <IKImage
+                    path={service.img}
+                    className="w-full h-full object-cover rounded-xl"
+                    alt={service.title}
+                  />
+                  <div className="absolute inset-0 bg-black/20 rounded-xl" />
+                  <div className="absolute top-46 left-5 text-white text-sm">
+                    <h2 className="text-xl font-semibold">{service.title}</h2>
+                    Imagen de{' '}
+                    <a
+                      href={service.reference}
+                      className="text-white text-sm underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Freepik
+                    </a>
+                  </div>
+                </div>
+
+                <div className="absolute w-full h-full backface-hidden rotate-y-180 bg-white shadow-md rounded-xl p-6 flex flex-col justify-center">
+                  <h2 className="text-xl font-semibold mb-4 text-center">
+                    {service.title}
+                  </h2>
+                  <ul className="list-disc text-gray-700 text-left text-sm pl-5">
+                    {service.points.map((point, i) => (
+                      <li key={i}>{point}</li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.div>
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );
@@ -27,132 +122,66 @@ export const Services = () => {
 
 const services = [
   {
-    title: 'Language Disorders',
-    description:
-      'Treatment for difficulties with understanding or using words in context, both verbally and nonverbally.',
-    icon: ({ className }) => (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className={className}
-      >
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-      </svg>
-    ),
+    title: 'Trastornos del Lenguaje',
+    reference:
+      'https://www.freepik.es/foto-gratis/nina-sosteniendo-papel-letra-logopedia_18682927.htm',
+    points: [
+      'Disfasia',
+      'Afasia',
+      'Retraso del lenguaje',
+      'Trastorno semántico-pragmático',
+      'Multismo selectivo',
+    ],
+    img: 'cartel.jpg',
   },
   {
-    title: 'Speech Disorders',
-    description:
-      'Therapy for articulation disorders, phonological processes, and motor speech disorders.',
-    icon: ({ className }) => (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className={className}
-      >
-        <path d="M12 18h.01" />
-        <path d="M8 18h.01" />
-        <path d="M16 18h.01" />
-        <path d="M12 14h.01" />
-        <path d="M8 14h.01" />
-        <path d="M16 14h.01" />
-        <path d="M12 10h.01" />
-        <path d="M8 10h.01" />
-        <path d="M16 10h.01" />
-        <rect width="18" height="18" x="3" y="3" rx="2" />
-      </svg>
-    ),
+    title: 'Trastornos del Habla',
+    reference:
+      'https://www.freepik.es/foto-gratis/disposicion-diferentes-letras-sesiones-logopedia_18682910.htm',
+    points: [
+      'Disglosia, Dislalia, Disartria',
+      'Dispraxia verbal',
+      'Trastornos en la fluidez',
+      'Disfemia, Taquifemia, Bradifemia',
+      'Farfulleo',
+    ],
+    img: 'cartas.jpg',
   },
   {
-    title: 'Voice Disorders',
-    description:
-      'Treatment for problems with pitch, volume, tone, and other voice qualities.',
-    icon: ({ className }) => (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className={className}
-      >
-        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-        <line x1="12" x2="12" y1="19" y2="23" />
-        <line x1="8" x2="16" y1="23" y2="23" />
-      </svg>
-    ),
+    title: 'Trastornos Auditivos y de la Voz',
+    reference:
+      'https://www.freepik.es/foto-gratis/nino-pequeno-lindo-vista-frontal-vestido-rosa-susurrando-algo_9990825.htm',
+    points: [
+      'Hipoacusia',
+      'Audífonos - implante coclear',
+      'Afonía',
+      'Disfonía',
+    ],
+    img: 'oido.jpg',
   },
   {
-    title: 'Fluency Disorders',
-    description:
-      'Specialized therapy for stuttering and other fluency disorders affecting the flow of speech.',
-    icon: ({ className }) => (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className={className}
-      >
-        <polyline points="4 17 10 11 4 5" />
-        <line x1="12" x2="20" y1="19" y2="19" />
-      </svg>
-    ),
+    title: 'Dificultades de Aprendizaje',
+    reference:
+      'https://www.freepik.es/foto-gratis/cabrito-alfabetos-coloridos_26677064.htm',
+    points: ['Dislexia', 'Disortografía', 'Disgrafía', 'Discalculia'],
+    img: 'letras.jpg',
   },
   {
-    title: 'Swallowing Disorders',
-    description:
-      'Evaluation and treatment for difficulties with eating and swallowing (dysphagia).',
-    icon: ({ className }) => (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className={className}
-      >
-        <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
-      </svg>
-    ),
+    title: 'Dificultades en la Alimentación',
+    reference:
+      'https://www.freepik.es/foto-gratis/nina-comiendo-fruta_12233809.htm',
+    points: ['Desglución disfuncional', 'Deglución atípica'],
+    img: 'comida.jpg',
   },
   {
-    title: 'Cognitive Communication',
-    description:
-      'Therapy for communication issues related to thinking skills, including attention, memory, and problem-solving.',
-    icon: ({ className }) => (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className={className}
-      >
-        <circle cx="12" cy="12" r="10" />
-        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-        <path d="M12 17h.01" />
-      </svg>
-    ),
+    title: 'Trastornos del Neurodesarrollo',
+    reference:
+      'https://www.freepik.es/foto-gratis/vista-superior-ninos-no-binarios-jugando-juego-colorido_11385756.htm#query=autismo&position=27&from_view=search&track=sph',
+    points: [
+      'Trastorno del desarrollo intelectual',
+      'Trastorno de la comunicación',
+      'Trastorno del espectro autista',
+    ],
+    img: 'gafas.jpg',
   },
 ];
