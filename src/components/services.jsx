@@ -71,11 +71,11 @@ export const Services = () => {
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: false, amount: 0.1 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="w-120 h-60 mx-auto"
+              className="w-80 h-40 sm:w-120 sm:h-60 mx-auto"
               onClick={() => toggleCard(index)}
             >
               <motion.div
-                className="relative w-full h-full cursor-pointer transition-transform duration-300 hover:scale-105"
+                className="relative w-full h-full cursor-pointer transition-transform duration-100 hover:scale-105"
                 animate={{ rotateY: isFlipped ? 180 : 0 }}
                 transition={{ duration: 0.6 }}
                 style={{ transformStyle: 'preserve-3d' }}
@@ -87,7 +87,7 @@ export const Services = () => {
                     alt={service.title}
                   />
                   <div className="absolute inset-0 bg-black/20 rounded-xl" />
-                  <div className="absolute top-46 left-5 text-white text-sm">
+                  <div className="absolute top-25 left-2 sm:top-46 sm:left-5 text-white text-sm">
                     <h2 className="text-xl font-semibold">{service.title}</h2>
                     Imagen de{' '}
                     <a
